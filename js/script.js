@@ -1,23 +1,21 @@
-
-//Hacer una función para eliminar un chiste del LocalStorage
 //Hacer una función para obtener un chiste de la API TERMINADO
 //Hacer una función para obtener los chistes del LocalStorage TERMINADO
 //Hacer una función para guardar un chiste en el LocalStorage TERMINADO
-//Hacer una función para añadir un chiste al DOM
-//Enlazar botón obtener chiste con las funciones anteriores
+//Hacer una función para añadir un chiste al DOM TERMINADO
+//Enlazar botón obtener chiste con las funciones anteriores TERMINADO
 //Hacer una función para eliminar un chiste del LocalStorage TERMINADO
-//Hacer una función para eliminar un chiste del DOM
-//Enlazar botón eliminar chiste con las funciones anteriores
-//Cargar los chistes guardados del LocalStorage al recargar la página
-//Hacer botón de eliminar todos los chistes
+//Hacer una función para eliminar un chiste del DOM TERMINADO
+//Enlazar botón eliminar chiste con las funciones anteriores TERMINADO
+//Cargar los chistes guardados del LocalStorage al recargar la página TERMINADO
+//Hacer botón de eliminar todos los chistes TERMINADO
 //Tirar los poderes de CSS
 
 const fetchJoke = document.getElementById('fetchJoke');
+const removeJokes = document.getElementById('removeJokes');
 const jokeList = document.getElementById('jokeList');
 
 const endpoint = 'https://api.chucknorris.io/jokes/random';
 
-//Hacer una función para obtener un chiste de la API TERMINADO
 //Llamar así obtenerChisteAPI().then(chiste => TuCodigo)
 async function obtenerChisteAPI() {
     return fetch(endpoint)
@@ -35,7 +33,6 @@ async function obtenerChisteAPI() {
     });
 }
 
-//Hacer una función para obtener los chistes del LocalStorage TERMINADO
 //Devuelve un array con la lista de chistes
 function obtenerChistesAlmacenados() {
     const string = localStorage.getItem('chistes');
@@ -51,13 +48,23 @@ function obtenerChistesAlmacenados() {
     return json;
 }
 
-//Hacer una función para guardar un chiste en el LocalStorage TERMINADO
 //Almacena un chiste en el localStorage
 function almacenarChiste(chiste) {
     const chistesModificados = [...obtenerChistesAlmacenados(), chiste];
     localStorage.setItem('chistes', JSON.stringify(chistesModificados));
 }
 
+//Elimina uno o todos los chistes del localStorage (no pasar argumentos para eliminarlos todos)
+function eliminarChisteAlmacenado(posicion) {
+    if (posicion !== undefined) {
+        const chistesModificados = obtenerChistesAlmacenados();
+        chistesModificados.splice(posicion, 1);
+        localStorage.setItem('chistes', JSON.stringify(chistesModificados));
+    }
+    else {
+        localStorage.removeItem('chistes');
+    }
+}
 
 //Hacer una función para añadir un chiste al DOM
 function renderChistes() {
@@ -65,29 +72,31 @@ function renderChistes() {
     
     const chistes = obtenerChistesAlmacenados();
     
-    chistes.forEach((chiste, index) => {
+    chistes.forEach((chiste) => {
         const li = document.createElement('li');
         li.textContent = chiste;
-        jokeList.appendChild(li);
 
         //Añade un boton de eliminar a cada chiste.
         const btn = document.createElement('button');
         btn.textContent = 'Eliminar';
-        btn.addEventListener('click', () => eliminarChiste(index));
+
+        btn.addEventListener('click', () => {
+            for (let i=0; i<jokeList.children.length; i++) {
+                if (jokeList.children[i] === li) {
+                    eliminarChisteAlmacenado(i);
+                    renderChistes();
+                    return;
+                }
+            }
+        });
 
         li.appendChild(btn);
         jokeList.appendChild(li);
     });
-    }
-    //Funcion para eliminar del localStorage un chiste en concreto.
-    function eliminarChiste(index) {
-    const chistes = obtenerChistesAlmacenados();
-    chistes.splice(index, 1); // eliminar 1
-    localStorage.setItem('chistes', JSON.stringify(chistes));
-    renderChistes();
 }
+
 //Cargamos los chistes guardados en el localStorage.
-document.addEventListener("DOMContentLoaded", renderChistes)
+document.addEventListener('DOMContentLoaded', renderChistes);
 
 //Enlazar botón obtener chiste con las funciones anteriores
 fetchJoke.addEventListener('click', async () => {
@@ -98,34 +107,8 @@ fetchJoke.addEventListener('click', async () => {
     renderChistes();
 });
 
-
-
-
-/*
-obtenerChisteAPI().then(chiste => {
-    almacenarChiste(chiste);
-    
-    const string = localStorage.getItem("chistes");
-    const json = JSON.parse(string);
-    
-    console.log("Lista de chistes", json);
-    });
-    */
-
-//Elimina uno o todos los chistes del localStorage (no pasar argumentos para eliminarlos todos)
-function eliminarChisteAlmacenado(posicion) {
-    if (posicion !== undefined) {
-        let chistesModificados = obtenerChistesAlmacenados();
-        chistesModificados.splice(posicion, 1);
-        localStorage.setItem('chistes', JSON.stringify(chistesModificados));
-    }
-    else {
-        localStorage.removeItem('chistes');
-    }
-}
-
-obtenerChisteAPI().then(chiste => {
-    almacenarChiste(chiste);
-    console.log('Lista de chistes', obtenerChistesAlmacenados());
+//Enlazar botón eliminar chiste con las funciones anteriores
+removeJokes.addEventListener('click', () => {
+    eliminarChisteAlmacenado();
+    renderChistes();
 });
-
